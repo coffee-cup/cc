@@ -51,7 +51,7 @@ const Shader: React.FC = () => {
       vertexShader,
       fragmentShader,
     }),
-    []
+    [vertexShader, fragmentShader]
   );
 
   // useFrame(({ clock }) => {
