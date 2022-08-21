@@ -5,13 +5,13 @@ uniform float uTime;
 uniform vec2 uMouse;
 
 #define GRIDSIZE 20.
-#define DOTSIZE 20.
+#define DOTSIZE 2.
 
 #define DARK 1
 
 #ifdef DARK
 vec3 bg=vec3(0.,0.,0.);
-vec3 dotColour=vec3(.2667,.2667,.2667);
+vec3 dotColour=vec3(.22,.22,.22);
 vec3 mouseColor=vec3(.8706,0.,.898);
 #else
 vec3 bg=vec3(1.,1.,1.);
@@ -25,6 +25,10 @@ float circle(in vec2 _st,in float _radius){
   _radius+(_radius*.01),
   dot(l,l)*4.);
 }
+
+// float circle(vec2 p,float r){
+  //   return length(p)-r;
+// }
 
 float smooth_circle(vec2 position,float radius){
   vec2 d=position-vec2(.5);
@@ -57,16 +61,17 @@ void main(){
   
   // uv*=50.;
   // uv=fract(uv);
-  float size=uResolution.x/GRIDSIZE;
-  vec2 gridUv=uv*size;
-  gridUv=fract(gridUv);
+  // float size=GRIDSIZE/uResolution.y;
+  vec2 size=vec2(uResolution.x/GRIDSIZE,uResolution.y/GRIDSIZE);
+  vec2 gridUv=fract(vUv*size);
+  color=vec3(gridUv,0.);
   
   // color*=dotColour;
   // vec3 dotMask=bg-(vec3(circle(uv,.1))*(1.-dotColour));
   
   // float dotSize=max(.02,min(.1,distance(vUv,mouse)));
-  float dotSize=(DOTSIZE/uResolution.x);
-  // dotSize*=50.;
+  float dotSize=(DOTSIZE/uResolution.x)*size.x;
+  dotSize*=.1;
   
   vec3 dotMask=vec3(circle(gridUv,dotSize));
   color=dotMask;
@@ -78,22 +83,23 @@ void main(){
   mouseUv=mouseUv*.5+.5;
   
   vec3 mouseMask=vec3(smooth_circle(mouseUv-(mouse-vec2(.5)),mouseRadius));
-  color=mouseMask;
+  // color=mouseMask;
   
   // vec3 c=(.9*vec3(vUv,1.)*(1.-dotMask));
   // vec3 c=(.9*vec3(vUv,1.));
-  vec3 c=mouseColor;
-  color=c;
+  vec3 c=.6*mouseColor;
+  // color=c;
   
   color=dotMask*c;
   color=mouseMask*c*dotMask;
-  
-  // color=min(vec2(.5),mouseMask)*c;
   
   color=bg-(dotMask*(bg-dotColour));
   color+=mouseMask*(c-dotColour)*dotMask;
   
   // color*=(circle(vUv,length(vUv-mouseUv))+.8);
+  
+  // vec2 testUv=vUv*vec2(uResolution.x/GRIDSIZE,uResolution.y/GRIDSIZE);
+  // color=vec3(fract(testUv),1.);
   
   gl_FragColor=vec4(color,1.);
 }
