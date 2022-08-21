@@ -19,6 +19,8 @@ vec3 dotColour=vec3(.8314,.8314,.8314);
 vec3 mouseColor=vec3(.9333,0.,1.);
 #endif
 
+float barrelPower=4.;
+
 float circle(in vec2 _st,in float _radius){
   vec2 l=_st-vec2(.5);
   return 1.-smoothstep(_radius-(_radius*.01),
@@ -47,12 +49,23 @@ float dotGrid(vec2 st,float res){
   return circle(dotsAtF,.1);
 }
 
+vec2 distort(vec2 p){
+  float theta=atan(p.y,p.x);
+  float radius=length(p);
+  radius=pow(radius,barrelPower);
+  p.x=radius*cos(theta);
+  p.y=radius*sin(theta);
+  return.5*(p+1.);
+}
+
 void main(){
   vec2 uv=vUv;
-  uv.x*=uResolution.x/uResolution.y;
+  // uv.x*=uResolution.x/uResolution.y;
   
   vec3 color=vec3(0.);
   vec2 mouse=(uMouse*.5+.5);
+  
+  // uv=distort(uv);
   
   // uv*=4.;
   
@@ -63,7 +76,7 @@ void main(){
   // uv=fract(uv);
   // float size=GRIDSIZE/uResolution.y;
   vec2 size=vec2(uResolution.x/GRIDSIZE,uResolution.y/GRIDSIZE);
-  vec2 gridUv=fract(vUv*size);
+  vec2 gridUv=fract(uv*size);
   color=vec3(gridUv,0.);
   
   // color*=dotColour;
@@ -77,7 +90,7 @@ void main(){
   color=dotMask;
   
   float mouseRadius=.25;
-  vec2 mouseUv=vUv*2.-1.;
+  vec2 mouseUv=uv*2.-1.;
   // color=vec3(mouseUv,0.);
   mouseUv.x*=uResolution.x/uResolution.y;
   mouseUv=mouseUv*.5+.5;
@@ -87,7 +100,7 @@ void main(){
   
   // vec3 c=(.9*vec3(vUv,1.)*(1.-dotMask));
   // vec3 c=(.9*vec3(vUv,1.));
-  vec3 c=.6*mouseColor;
+  vec3 c=1.*mouseColor;
   // color=c;
   
   color=dotMask*c;
